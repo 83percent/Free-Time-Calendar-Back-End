@@ -3,7 +3,6 @@ const express = require('express');
 // Router
 const user = require('./router/User');
 
-
 // FIELD
 const PORT = 3002;
 const server = express();
