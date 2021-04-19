@@ -11,6 +11,7 @@ async function create(id) {
             group: [id]
         })
         await group.save();
+        return true;
     } catch(err) {console.log(err); return 'error';}
 }
 /*
@@ -92,4 +93,45 @@ async function ban(groupCode, adminID, banID) {
         }
     } catch(err) {console.log(err); return 'error';}   
 }
-module.exports = {create, open, apply}
+
+/*
+    getGroupList(admin, groupCode)
+    @param groupCode    그룹 고유코드
+    @param admin        요청한 admin 고유코드
+
+    @return false       권한 없음
+    @return [...]       성공
+*/
+async function getGroupList(admin, groupCode) {
+    try {
+        const group = await GroupModel.findById(groupCode, ['admin', 'group']);
+        if(!group.admin || group.admin != admin) return false;
+        else {
+            return group;
+        }
+    } catch(err) {console.log(err); return 'error';}
+}
+
+async function changeAdmin(groupCode, admin) {
+    try {
+        const group = await GroupModel.findById(groupCode, ['admin']);
+        if(!group.admin) return null;
+        else if(group.admin != admin[0]) return false;
+        else {
+            group.admin = admin[1];
+            await group.save();
+            return true;
+        }
+    } catch(err) {console.log(err); return 'error';}
+}
+
+async function outOfGroup(groupCode, id) {
+    try {
+        const group = await GroupModel.findById(groupCode, ['group']);
+        if(!group || group.group.indexOf(id) == -1) return null;
+        else {
+            group.group.slice()
+        }
+    } catch(err) {console.log(err); return 'error';}
+}
+module.exports = {create, open, apply, getGroupList, changeAdmin, outOfGroup}
