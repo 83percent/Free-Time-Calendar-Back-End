@@ -10,7 +10,7 @@ const router = express.Router();
 */
 router.post('/sign', async (req, res) => {
     const data = req.body;
-    if(!data.email || !data.password || !data.username) res.sendStatus(401);
+    if(!data.email || !data.password || !data.name) res.sendStatus(401);
     
 });
 
