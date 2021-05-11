@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
 const COLL_NAME = "group";
 
+
+
+// Vote of create schedule
+const Vote = new mongoose.Schema({
+    lessMember: {
+        type: Number
+    },
+    date : [] // [start, end]
+})
+
 const GroupModel = new mongoose.Schema({
     admin : {
         type: String,
@@ -14,6 +24,7 @@ const GroupModel = new mongoose.Schema({
             [id, name]
         ]
     */
+    vote : [],
     open : {
         type: Boolean,
         default: true

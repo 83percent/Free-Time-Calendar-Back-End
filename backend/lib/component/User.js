@@ -1,11 +1,22 @@
 const UserModel = require('../Model/UserModel');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+/*
+    로그인
+    @param email    :String
+    @param password :String
 
-
+    @return _id     :String     로그인 성공
+    @return null    :NULL       로그인 실패
+*/
 async function login(email, password) {
+    
     try {
-        const user = await UserModel.findOne({email: email}, ['name']);
+        const user = await UserModel.findOne({email: email}, ['password']);
         if(!user) {return null} // 등록된 회원 없음
-        else return user.password == password;
+        else {
+            return await bcrypt.compare(password, user.password) ? user._id : null;
+        }
     } catch(err) {console.log(err); return 'error';}
 }
 
@@ -19,20 +30,32 @@ async function get(id) {
     } catch(err) {console.log(err); return 'error';}
 }
 
-async function set(data) {
+/*
+    회원가입
+    @param email :String
+    @param password :String
+    @param name :String
+
+    @return 1   성공
+    @return 0   중복
+    @return -1  에러
+*/
+async function set(email, password, name) {
     try {
-        let user = await UserModel.findOne({email: data.email});
-        if(user._id) return false; // 이미 존재하는 아이디
+        let user = await UserModel.findOne({email: email});
+        if(user?._id) return 0; // 이미 존재하는 아이디
         else {
-           user = new UserModel({
-               email: data.email,
-               password : data.password,
-               name : data.name
-           });
-           await user.save();
-           return true;
+            const salt = bcrypt.genSaltSync(saltRounds);
+            const hash = bcrypt.hashSync(password, salt);
+            user = new UserModel({
+                email: email,
+                password : hash,
+                name : name
+            });
+            await user.save();
+            return 1;
         }
-    } catch(err) {console.log(err); return 'error';}
+    } catch(err) {console.log(err); return -1;}
 }
 async function remove(id) {
     try {

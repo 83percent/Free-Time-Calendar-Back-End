@@ -125,7 +125,7 @@ router.put("/:GroupCode", async (req, res) => {
 */
 router.put("/:GroupCode", async (req, res) => {
     const id = req.body.id;
-    const groupCode = req.params.GroupCode;
+    const groupCode = req.params?.GroupCode;
     if(!groupCode || !id) res.sendStatus(401);
     else {
         const result = await Group.outOfGroup(groupCode, id);
