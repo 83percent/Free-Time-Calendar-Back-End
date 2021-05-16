@@ -18,16 +18,16 @@ router.post('/sign', async (req, res) => {
         const result = await User.set(email, password, name);
         switch(result) {
             case 1 : {
-                res.Status(StatusCode.success).send(true); // 200
+                res.status(StatusCode.success).send(true); // 200
                 break;
             }
             case 0 : {
-                res.Status(StatusCode.exist).send(false); // 208
+                res.status(StatusCode.exist).send(false); // 208
                 break;
             }
             case -1 :
             default : {
-                res.Status(StatusCode.error).send(false); // 500
+                res.status(StatusCode.error).send(false); // 500
                 break;
             }
         }

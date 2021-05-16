@@ -1,7 +1,28 @@
 const mongoose = require('mongoose');
 const COLL_NAME = "user";
 
+/* const FreeModel = mongoose.Schema({
+    start: {
+        type: String,
+        required: true
+    },
+    end: {
+        type: String,
+        required: true
+    },
+    memo: {
+        type: String
+    },
+    open: []
+}); */
 
+const FreeCateModel = mongoose.Schema({
+    cate : {
+        type: String,
+        required: true
+    },
+    list : [],
+});
 
 const UserModel = new mongoose.Schema({
     email: {
@@ -18,7 +39,9 @@ const UserModel = new mongoose.Schema({
         type: String,
         required: true
     },
-    schedule : {}, 
+    schedule : {
+        type: Object,
+    }, 
     /*
         schedule : {
             'Y2021-M4' : [
@@ -36,7 +59,7 @@ const UserModel = new mongoose.Schema({
             ]
         }
     */
-    free : {},
+    free : [FreeCateModel],
     /*
         free {
             'Y2021-M4' : [

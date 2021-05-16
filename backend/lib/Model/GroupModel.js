@@ -14,7 +14,11 @@ const Vote = new mongoose.Schema({
 const GroupModel = new mongoose.Schema({
     admin : {
         type: String,
-        require: true
+        required: true
+    },
+    name : {
+        type: String,
+        required: true
     },
     group : [], // :user._id
     ban : [], // 차단된 계정
@@ -29,10 +33,13 @@ const GroupModel = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    schedules : [],
     reg_date : {
         type: Date,
         default: Date.now()
     }
+}, {
+    versionKey: false
 });
 
 module.exports = mongoose.model(COLL_NAME, GroupModel);

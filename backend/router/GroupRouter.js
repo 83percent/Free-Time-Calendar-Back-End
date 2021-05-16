@@ -1,31 +1,44 @@
 const express = require('express');
 const router = express.Router();
+const StatusCode = require("../lib/Status-code/StatusCode");
 
 const Group = require('../lib/component/Group');
 
 // Group 생성
 /*
     @return 200 성공
-    @return 401 요청 형식 일치하지 않음
+    @return 412 요청 형식 일치하지 않음
     @return 500 서버오류
 */
 router.post("/", async (req, res) => {
-    const admin = req.body.admin;
-    if(!admin) res.sendStatus(401);
+    const {admin, name} = req.body;
+
+    if(!admin || !name) res.sendStatus(StatusCode.invalid);     // 412
     else {
-        const result = await Group.create(admin);
-        if(result == 'error') res.sendStatus(500);
-        else res.sendStatus(200);   
+        const result = await Group.create(admin, name);
+        if(result == 'error') res.sendStatus(StatusCode.error); // 500
+        else res.send(result); // 200
     }
 });
-// Group list 받아오기
+/*
+    사용자 그룹 정보 받기 : group 의 list view 완성을 위해
+*/
+router.get("/list/:id", async (req, res) => {
+    const id = req.params.id;
+    if(!id) res.sendStatus(StatusCode.invalid); // 412
+    else {
+        const result = await Group.getUserGroupInfo(id);
+    }
+})
+
+// Group member 받아오기
 /*
     @return 200 성공
     @return 204 권한 없음
     @return 401 요청 형식 일치하지 않음
     @return 500 서버오류
 */
-router.get("/list/:GroupCode", async (req, res) => {
+router.get("/member/:GroupCode", async (req, res) => {
     const admin = req.body.admin;
     const groupCode = req.params.GroupCode;
     if(!groupCode || !admin) res.sendStatus(401);

@@ -1,17 +1,24 @@
 const GroupModel = require('../Model/GroupModel');
+const UserModel = require('../Model/UserModel');
 
 // 그룹 만들기
 /*
     @param id:string 최초 생성자 고유 id
 */
-async function create(id) {
+async function create(id, name) {
     try {
         const group = new GroupModel({
             admin: id,
+            name: name,
             group: [id]
-        })
-        await group.save();
-        return true;
+        });
+        const result = await group.save();
+
+        const user = await UserModel.findById(id);
+        user.group.push(result._id);
+        await user.save();
+
+        return result._id;
     } catch(err) {console.log(err); return 'error';}
 }
 /*
@@ -134,4 +141,21 @@ async function outOfGroup(groupCode, id) {
         }
     } catch(err) {console.log(err); return 'error';}
 }
-module.exports = {create, open, apply, getGroupList, changeAdmin, outOfGroup}
+
+
+async function getUserGroupInfo(id) {
+    const user = await UserModel.findById(id);
+    const groups = user?.group;
+    if(!groups || groups.length == 1) return {};
+    else {
+        try {
+            groups.reduce(async (acc, id) => {
+                const group = GroupModel.findById(id);
+                acc[id] = [group.group.length ,group?.schedules.length]
+                return acc;
+            }, {});
+        } catch {return null}
+        
+    }
+}
+module.exports = {create, open, apply, getGroupList, changeAdmin, outOfGroup, getUserGroupInfo}
