@@ -28,6 +28,19 @@ router.get("/list/:id", async (req, res) => {
     if(!id) res.sendStatus(StatusCode.invalid); // 412
     else {
         const result = await Group.getUserGroupInfo(id);
+        console.log(JSON.stringify(result));
+        if(result) res.send(JSON.stringify(result));
+        else {
+            switch(result) {
+                case 0 : {
+                    res.sendStatus(StatusCode.nodata);
+                }
+                case null :
+                default : {
+                    res.sendStatus(StatusCode.error);
+                }
+            }
+        }
     }
 })
 

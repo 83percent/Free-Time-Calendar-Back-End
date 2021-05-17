@@ -30,7 +30,7 @@ router.post('/sign', async (req, res) => {
                 res.status(StatusCode.error).send(false); // 500
                 break;
             }
-        }
+        }   
     }
 });
 

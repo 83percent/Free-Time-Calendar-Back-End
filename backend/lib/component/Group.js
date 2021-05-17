@@ -146,14 +146,21 @@ async function outOfGroup(groupCode, id) {
 async function getUserGroupInfo(id) {
     const user = await UserModel.findById(id);
     const groups = user?.group;
-    if(!groups || groups.length == 1) return {};
+    if(!groups || groups.length == 0) return 0;
     else {
         try {
-            groups.reduce(async (acc, id) => {
-                const group = GroupModel.findById(id);
-                acc[id] = [group.group.length ,group?.schedules.length]
-                return acc;
-            }, {});
+            const returnArr = [];
+            for(const id of groups) {
+                const group = await GroupModel.findById(id);
+
+                returnArr.push({
+                    _id : group._id,
+                    name : group.name,
+                    scheduleCount : group.schedules.length,
+                    memberCount : group.group.length
+                })
+            }
+            return returnArr;
         } catch {return null}
         
     }
