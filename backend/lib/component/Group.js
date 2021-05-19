@@ -61,12 +61,13 @@ async function open(groupCode, id, boolean) {
 */
 async function apply(groupCode, id) {
     try {
-        const group = await GroupModel.findById(groupCode, ['wait', 'ban']);
+        const group = await GroupModel.findById(groupCode, ['group','wait', 'ban']);
         if(!group) return null;
         else {
-            if(group.ban.length != 0 && group.ban.indexOf(id) != -1) return -1; 
+            if(group.ban.length != 0 && group.ban.indexOf(id) != -1) return -2; 
             else {
-                if(group.wait.indexOf(id) != -1) return 0;
+                if(group.group.indexOf(id) != -1 ) return 0;
+                else if(group.wait.indexOf(id) != -1) return -1
                 group.wait.push(id);
                 await group.save();
                 return 1;
@@ -109,14 +110,28 @@ async function ban(groupCode, adminID, banID) {
     @return false       권한 없음
     @return [...]       성공
 */
-async function getGroupList(admin, groupCode) {
+async function getGroupList(groupCode) {
     try {
-        const group = await GroupModel.findById(groupCode, ['admin', 'group']);
-        if(!group.admin || group.admin != admin) return false;
+        const {group} = await GroupModel.findById(groupCode, ['group']);
+        if(!group || group.length == 0) return null;
         else {
-            return group;
+            const result = [];
+            try {
+                for(const id of group) {
+                    
+                    const member = await UserModel.findById(id, ["_id", "name"]);
+                    result.push({
+                        id : member._id,
+                        name : member.name
+                    });
+                }
+                return result;
+            } catch(e) {
+                console.log(e);
+                return null;
+            }
         }
-    } catch(err) {console.log(err); return 'error';}
+    } catch(err) {console.log(err); return false;}
 }
 
 async function changeAdmin(groupCode, admin) {
@@ -154,7 +169,7 @@ async function getUserGroupInfo(id) {
                 const group = await GroupModel.findById(id);
 
                 returnArr.push({
-                    _id : group._id,
+                    id : group._id,
                     name : group.name,
                     scheduleCount : group.schedules.length,
                     memberCount : group.group.length

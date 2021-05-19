@@ -28,12 +28,12 @@ router.get("/list/:id", async (req, res) => {
     if(!id) res.sendStatus(StatusCode.invalid); // 412
     else {
         const result = await Group.getUserGroupInfo(id);
-        console.log(JSON.stringify(result));
-        if(result) res.send(JSON.stringify(result));
+        if(result) res.send(result);
         else {
             switch(result) {
                 case 0 : {
                     res.sendStatus(StatusCode.nodata);
+                    break;
                 }
                 case null :
                 default : {
@@ -52,22 +52,20 @@ router.get("/list/:id", async (req, res) => {
     @return 500 서버오류
 */
 router.get("/member/:GroupCode", async (req, res) => {
-    const admin = req.body.admin;
     const groupCode = req.params.GroupCode;
-    if(!groupCode || !admin) res.sendStatus(401);
+    console.log(groupCode);
+    const result = await Group.getGroupList(groupCode); 
+    console.log(result);
+    if(result) res.status(200).send(result);
     else {
-        const result = await Group.getGroupList(admin, groupCode);
-        if(result?.admin) res.statusCode(200).send(result.group);
-        else {
-            switch(result) {
-                case false : {
-                    res.sendStatus(204);
-                    break;
-                }
-                case 'error' :
-                default : {
-                    res.sendStatus(500);
-                }
+        switch(result) {
+            case null : {
+                res.status(StatusCode.nodata);
+                break;
+            }
+            case false :
+            default : {
+                res.status(StatusCode.error);
             }
         }
     }
@@ -176,4 +174,20 @@ router.put("/:GroupCode", async (req, res) => {
     }
 });
 
+/*
+=======================
+        Apply
+=======================
+*/
+router.post("/apply/:GroupCode", async(req, res) => {
+    const code = req.params?.GroupCode;
+    const id = req.body?.id;
+    if(!code || !id) res.sendStatus(StatusCode.invalid); // 412
+    else {
+        const result = await Group.apply(code, id);
+        if(result != null) res.send(`${result}`);
+        else if(result == 'error') res.sendStatus(StatusCode.error); // 500
+        else if(result == null) res.sendStatus(StatusCode.nodata); // 404
+    }
+});
 module.exports = router;
