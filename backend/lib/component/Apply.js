@@ -1,4 +1,5 @@
 const GroupModel = require('../Model/GroupModel');
+const UserModel = require('../Model/UserModel');
 
 /*
     그룹 참여 신청자 목록 받아오기
@@ -42,6 +43,39 @@ async function add(groupCode, applier) {
         }
     } catch(err) {console.log(err); return 'error';}   
 }
+
+async function accept(groupCode, applierID) {
+    const group = await GroupModel.findById(groupCode, ["wait","group"]);
+    const user = await UserModel.findById(applierID, ["group"]);
+    if(!group || !user) return null;
+    
+    if(group.wait.indexOf(applierID) != -1) {
+        group.wait.splice(group.group.indexOf(applierID), 1);
+        group.group.push(applierID);
+        await group.save();
+        if(user.group.indexOf(groupCode) == -1) {
+            user.group.push(groupCode);
+            await user.save();
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+async function reject(groupCode, applierID) {
+    const group = await GroupModel.findById(groupCode, ["wait","group"]);
+    if(!group) return null;
+    if(group.wait.indexOf(applierID) != -1) {
+        group.wait.splice(group.group.indexOf(applierID), 1);
+        group.group.push(applierID);
+        await group.save().exec();
+        return true;
+    } else {
+        return false;
+    }
+}
 module.exports = {
-    get, add
+    get, add, accept, reject
 }

@@ -14,6 +14,11 @@ const Apply = require('../lib/component/Apply');
 router.get("/list/:GroupCode", async (req, res) => {
     const groupCode = req.params?.GroupCode;
     const admin = req.body?.admin;
+
+    console.log("그룹 코드 : ",groupCode);
+    console.log("어드민 : ",admin);
+
+
     if(!groupCode || !admin) res.sendStatus(401)
     else {
         const result = await Apply.get(groupCode, admin);

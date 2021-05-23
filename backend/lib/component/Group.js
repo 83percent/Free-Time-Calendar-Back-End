@@ -79,8 +79,8 @@ async function apply(groupCode, id) {
 async function getApplyList(groupCode) {
     try {
         const {wait} = await GroupModel.findById(groupCode, ["wait"]);
-
-        if(!wait) {
+        console.log(wait);
+        if(wait) {
             if(wait.length == 0) return [];
             else {
                 let resultArr = [];
@@ -88,6 +88,7 @@ async function getApplyList(groupCode) {
                     const {name} = await UserModel.findById(id, ["name"]);
                     resultArr.push({id, name});
                 }
+                console.log("결과 : ", resultArr);
                 return resultArr;
             }
         } else return [];

@@ -3,7 +3,7 @@ const router = express.Router();
 const StatusCode = require("../lib/Status-code/StatusCode");
 
 const Group = require('../lib/component/Group');
-
+const Apply = require('../lib/component/Apply');
 // Group 생성
 /*
     @return 200 성공
@@ -185,6 +185,8 @@ router.get("/apply/list/:GroupCode", async (req, res) => {
         else res.status(StatusCode.error).send("-2");
     }
 });
+
+// 그룹 참여 신청
 router.post("/apply/:GroupCode", async(req, res) => {
     const code = req.params?.GroupCode;
     const id = req.body?.id;
@@ -197,5 +199,46 @@ router.post("/apply/:GroupCode", async(req, res) => {
     }
 });
 
-
+// 그룹 참여 신청 허용
+router.post("/apply/list/:GroupCode", async (req, res) => {
+    const code = req.params?.GroupCode;
+    const id = req.body?.id;
+    if(!code || !id) res.sendStatus(StatusCode.invalid); // 412
+    else {
+        const result = await Apply.accept(code, id);
+        switch(result) {
+            case true : {
+                res.send("1"); // 200
+                break;
+            }
+            case false : {
+                res.status(StatusCode.nodata); // 404
+            }
+            default : {
+                res.status(StatusCode.error); // 500
+            }
+        }
+    }
+});
+// 그룹 참여 신청 거절
+router.delete("/apply/list/:GroupCode", async (req, res) => {
+    const code = req.params?.GroupCode;
+    const id = req.body?.id;
+    if(!code || !id) res.sendStatus(StatusCode.invalid); // 412
+    else {
+        const result = await Apply.reject(code, id);
+        switch(result) {
+            case true : {
+                res.send("1"); // 200
+                break;
+            }
+            case false : {
+                res.status(StatusCode.nodata); // 404
+            }
+            default : {
+                res.status(StatusCode.error); // 500
+            }
+        }
+    }
+});
 module.exports = router;

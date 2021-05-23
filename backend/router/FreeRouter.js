@@ -4,6 +4,8 @@ const router = express.Router();
 
 const Free = require("../lib/component/Free");
 
+router.get("/:")
+
 router.post("/:id", async(req, res) => {
     const data = req?.body;
     const id = req?.params?.id;
