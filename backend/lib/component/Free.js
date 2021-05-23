@@ -9,7 +9,7 @@ async function set(id, data) {
         const dateCate = `Y${sYear}-M${sMonth}`;
         const insertData = new FreeModel({
             start: `${sYear}-${sMonth}-${sDay} ${sHour}:${sMin}`,
-                end: `${eYear}-${eMonth}-${eDay} ${eHour}:${eMin}`
+            end: `${eYear}-${eMonth}-${eDay} ${eHour}:${eMin}`
         })
         try {
             let cateObj = null;

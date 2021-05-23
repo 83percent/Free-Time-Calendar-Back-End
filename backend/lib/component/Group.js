@@ -76,6 +76,24 @@ async function apply(groupCode, id) {
     } catch(err) {console.log(err); return 'error';}
 } // apply
 
+async function getApplyList(groupCode) {
+    try {
+        const {wait} = await GroupModel.findById(groupCode, ["wait"]);
+
+        if(!wait) {
+            if(wait.length == 0) return [];
+            else {
+                let resultArr = [];
+                for(const id of wait) {
+                    const {name} = await UserModel.findById(id, ["name"]);
+                    resultArr.push({id, name});
+                }
+                return resultArr;
+            }
+        } else return [];
+    } catch(err) {console.log(err); return 'error';}
+} // getApplyList
+
 /*
     ban(groupCode, adminId, banId)
     @param groupCode    그룹 고유코드
@@ -149,11 +167,29 @@ async function changeAdmin(groupCode, admin) {
 
 async function outOfGroup(groupCode, id) {
     try {
-        const group = await GroupModel.findById(groupCode, ['group']);
-        if(!group || group.group.indexOf(id) == -1) return null;
-        else {
-            group.group.slice()
+        const group = await GroupModel.findById(groupCode, ['group', 'admin']);
+        let index = -1;
+
+        if(group.group.length > 1) {
+            index = group.group.indexOf(id);
+            if(index == -1) return null;
+            else {
+                group.group.splice(index, 1);
+
+                if(group.admin == id) {
+                    // 그룹 관리자가 나갔을 경우 다음 사람에게 관리자 위임
+                    group.admin = group.group[0];
+                }
+                group.save();
+            }
+        } else {
+            await GroupModel.findByIdAndDelete(groupCode);
         }
+
+        const user = await UserModel.findById(id, ["group"]);
+        console.log(user.group.splice(user.group.indexOf(groupCode), 1));
+        await user.save();
+        return true;
     } catch(err) {console.log(err); return 'error';}
 }
 
@@ -171,6 +207,7 @@ async function getUserGroupInfo(id) {
                 returnArr.push({
                     id : group._id,
                     name : group.name,
+                    admin : group.admin,
                     scheduleCount : group.schedules.length,
                     memberCount : group.group.length
                 })
@@ -180,4 +217,7 @@ async function getUserGroupInfo(id) {
         
     }
 }
-module.exports = {create, open, apply, getGroupList, changeAdmin, outOfGroup, getUserGroupInfo}
+module.exports = {
+    create, open, 
+    apply, getApplyList, // Apply
+    getGroupList, changeAdmin, outOfGroup, getUserGroupInfo}

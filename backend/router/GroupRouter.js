@@ -147,28 +147,25 @@ router.put("/:GroupCode", async (req, res) => {
     @return 401 요청 형식 일치하지 않음
     @return 404 그룹 데이터 없음
 */
-router.put("/:GroupCode", async (req, res) => {
+router.delete("/:GroupCode", async (req, res) => {
     const id = req.body.id;
     const groupCode = req.params?.GroupCode;
-    if(!groupCode || !id) res.sendStatus(401);
+    if(!groupCode || !id) res.status(401).send('-2');
     else {
         const result = await Group.outOfGroup(groupCode, id);
+        console.log(result);
         switch(result) {
             case true : {
-                res.sendStatus(200);
-                break;
-            }
-            case false : {
-                res.sendStatus(204);
+                res.status(200).send("1");
                 break;
             }
             case null : {
-                res.sendStatus(404);
+                res.status(404).send("0");
                 break;
             }
             case 'error' :
             default : {
-                res.sendStatus(500);
+                res.status(500).send("-1");
             }
         }
     }
@@ -179,6 +176,15 @@ router.put("/:GroupCode", async (req, res) => {
         Apply
 =======================
 */
+router.get("/apply/list/:GroupCode", async (req, res) => {
+    const code = req.params?.GroupCode;
+    if(!code) res.status(StatusCode.invalid).send("-1"); // 412
+    else {
+        const result = await Group.getApplyList(code);
+        if(result != 'error') res.send(result);
+        else res.status(StatusCode.error).send("-2");
+    }
+});
 router.post("/apply/:GroupCode", async(req, res) => {
     const code = req.params?.GroupCode;
     const id = req.body?.id;
@@ -190,4 +196,6 @@ router.post("/apply/:GroupCode", async(req, res) => {
         else if(result == null) res.sendStatus(StatusCode.nodata); // 404
     }
 });
+
+
 module.exports = router;
