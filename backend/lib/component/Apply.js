@@ -50,7 +50,14 @@ async function accept(groupCode, applierID) {
     if(!group || !user) return null;
     
     if(group.wait.indexOf(applierID) != -1) {
-        group.wait.splice(group.group.indexOf(applierID), 1);
+        if(group.group.indexOf(applierID) != -1) {
+            console.log("before : ",group);
+            group.wait.splice(group.wait.indexOf(applierID), 1);
+            console.log("after : ", group);
+            await group.save();
+            return true;
+        }
+        group.wait.splice(group.wait.indexOf(applierID), 1);
         group.group.push(applierID);
         await group.save();
         if(user.group.indexOf(groupCode) == -1) {

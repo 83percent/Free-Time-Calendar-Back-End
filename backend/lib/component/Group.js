@@ -144,6 +144,7 @@ async function getGroupList(groupCode) {
                         name : member.name
                     });
                 }
+                console.log("참여자 목록 : ", result)
                 return result;
             } catch(e) {
                 console.log(e);

@@ -4,6 +4,9 @@ const StatusCode = require("../lib/Status-code/StatusCode");
 
 const Group = require('../lib/component/Group');
 const Apply = require('../lib/component/Apply');
+const Ban = require('../lib/component/Ban');
+const Free = require('../lib/component/Free');
+const Vote = require('../lib/component/Vote');
 // Group 생성
 /*
     @return 200 성공
@@ -240,5 +243,48 @@ router.delete("/apply/list/:GroupCode", async (req, res) => {
             }
         }
     }
+});
+
+/*
+=======================
+        Ban
+=======================
+*/
+router.get("/apply/ban/:GroupCode", async (req, res) => {
+    const code = req.params?.GroupCode;
+    if(!code) res.status(StatusCode.invalid).send("-1"); // 412
+    else {
+        const result = await Ban.getBanList(code);
+        if(result != 'error') res.send(result);
+        else res.status(StatusCode.error).send("-2");
+    }
+});
+
+/*
+=============================
+        Free & Schedule
+=============================
+*/
+// Get Group Member Free Time of Day
+router.post("/free/:groupCode", async (req, res) => {
+    const code = req.params?.groupCode;
+    const {year, month, day} = req.body;
+    if(!year || !month || !day) res.send(StatusCode.invalid);
+    else {
+        const result = await Free.getGroupFree(code, year, month, day);
+        if(result && result.length > 0) {
+            res.send(result);
+        } else if(result?. length < 1) {
+            res.status(StatusCode.nodata).send("[]") // 404
+        } else res.sendStatus(500)
+    }
+});
+// 그룹 투표추가
+router.post("/vote/:groupCode", async (req, res) => {
+    const code = req.params?.groupCode;
+    const {reg_id, start, end, name, minLength} = req.body;
+    const result = await Vote.addVote(code, reg_id, name, start, end, minLength);
+    if(result) res.send(result);
+    else res.status(500).send("error");
 });
 module.exports = router;
