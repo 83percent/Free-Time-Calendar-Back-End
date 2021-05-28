@@ -279,12 +279,20 @@ router.post("/free/:groupCode", async (req, res) => {
         } else res.sendStatus(500)
     }
 });
+
+// 그룹 투표 목록
+router.get("/vote/:groupCode", async (req, res) => {
+    const code = req.params?.groupCode;
+    const result = await Vote.getVoteList(code);
+    res.send(result);
+});
 // 그룹 투표추가
 router.post("/vote/:groupCode", async (req, res) => {
     const code = req.params?.groupCode;
-    const {reg_id, start, end, name, minLength} = req.body;
-    const result = await Vote.addVote(code, reg_id, name, start, end, minLength);
+    const {reg_id, memo,start, end, name, minLength} = req.body;
+    const result = await Vote.addVote(code, reg_id, name, start, end, minLength, memo);
     if(result) res.send(result);
     else res.status(500).send("error");
 });
+
 module.exports = router;
