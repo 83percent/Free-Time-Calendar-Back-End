@@ -39,7 +39,9 @@ const UserModel = new mongoose.Schema({
         type: String,
         required: true
     },
-    schedule : {}, 
+    schedule : {
+        type: Object
+    }, 
     /*
         schedule : {
             'Y2021-M4' : [
@@ -71,7 +73,8 @@ const UserModel = new mongoose.Schema({
    reg_date : {
        type : Date,
        default : Date.now()
-   }
+   },
+   alarm : []
 }, {
     versionKey: false
 });

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const COLL_NAME = "schedule";
 
 const ScheduleModel = mongoose.Schema({
-    cate : {
+    groupCode : {
         type: String,
         required : true
     },
@@ -20,7 +20,12 @@ const ScheduleModel = mongoose.Schema({
     },
     memo: {
         type: String
-    }
+    },
+    reg_id : {
+        type: String,
+        required: true
+    },
+    agree : []
 });
 
 module.exports = mongoose.model(COLL_NAME, ScheduleModel);  

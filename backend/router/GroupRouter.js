@@ -7,6 +7,7 @@ const Apply = require('../lib/component/Apply');
 const Ban = require('../lib/component/Ban');
 const Free = require('../lib/component/Free');
 const Vote = require('../lib/component/Vote');
+const Schedule = require('../lib/component/Schedule');
 // Group 생성
 /*
     @return 200 성공
@@ -28,9 +29,11 @@ router.post("/", async (req, res) => {
 */
 router.get("/list/:id", async (req, res) => {
     const id = req.params.id;
+    console.log("id : ", id);
     if(!id) res.sendStatus(StatusCode.invalid); // 412
     else {
         const result = await Group.getUserGroupInfo(id);
+        console.log(result);
         if(result) res.send(result);
         else {
             switch(result) {
@@ -293,6 +296,15 @@ router.post("/vote/:groupCode", async (req, res) => {
     const result = await Vote.addVote(code, reg_id, name, start, end, minLength, memo);
     if(result) res.send(result);
     else res.status(500).send("error");
+});
+
+
+// 그룹 스케줄 목록
+router.get("/schedule/:groupCode", async (req, res) => {
+    const code = req.params?.groupCode;
+    console.log(code);
+    const result = await Schedule.getGroupSchedule(code);
+    console.log(result);
 });
 
 module.exports = router;

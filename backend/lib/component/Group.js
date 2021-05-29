@@ -132,6 +132,7 @@ async function ban(groupCode, adminID, banID) {
 async function getGroupList(groupCode) {
     try {
         const {group} = await GroupModel.findById(groupCode, ['group']);
+        console.log("요청 그룹 리스트 : ", group)
         if(!group || group.length == 0) return null;
         else {
             const result = [];
@@ -205,17 +206,20 @@ async function getUserGroupInfo(id) {
             const returnArr = [];
             for(const id of groups) {
                 const group = await GroupModel.findById(id);
-
+                console.log(group);
                 returnArr.push({
                     id : group._id,
                     name : group.name,
                     admin : group.admin,
-                    scheduleCount : group.schedules.length,
+                    scheduleCount : group.schedule.length,
                     memberCount : group.group.length
                 })
             }
             return returnArr;
-        } catch {return null}
+        } catch(e) {
+            console.log(e);
+            return null
+        }
         
     }
 }
