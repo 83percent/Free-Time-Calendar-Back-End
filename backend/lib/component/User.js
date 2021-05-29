@@ -12,10 +12,10 @@ const saltRounds = 10;
 async function login(email, password) {
     
     try {
-        const user = await UserModel.findOne({email: email}, ['password']);
+        const user = await UserModel.findOne({email: email}, ['password', 'name']);
         if(!user) {return null} // 등록된 회원 없음
         else {
-            return await bcrypt.compare(password, user.password) ? user._id : null;
+            return await bcrypt.compare(password, user.password) ? {_id : user._id, name : user.name} : null;
         }
     } catch(err) {console.log(err); return 'error';}
 }

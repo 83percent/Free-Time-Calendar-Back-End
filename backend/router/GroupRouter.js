@@ -302,9 +302,22 @@ router.post("/vote/:groupCode", async (req, res) => {
 // 그룹 스케줄 목록
 router.get("/schedule/:groupCode", async (req, res) => {
     const code = req.params?.groupCode;
-    console.log(code);
     const result = await Schedule.getGroupSchedule(code);
+    console.log("비교 날짜 : ", new Date())
     console.log(result);
+    if(result) res.send(result);
+    else res.sendStatus(404);
 });
 
+/*
+    그룹의 스케줄 목록을 월별로 가져옴
+*/
+router.get("/schedule/:groupCode/:year/:month", async (req, res) => {
+    const {groupCode, year, month} = req.params;
+    if(year < 2021 || year > 2030 || month < 1 || month > 12) res.sendStatus(StatusCode.invalid); // 412
+    else {
+        const result = await Schedule.getGroupScheduleForMonth(groupCode, year, month);
+        console.log(result);
+    }
+});
 module.exports = router;

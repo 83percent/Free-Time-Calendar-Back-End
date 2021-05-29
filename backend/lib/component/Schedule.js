@@ -1,6 +1,7 @@
 const UserModel = require("../Model/UserModel");
 const ScheduleModel = require("../Model/ScheduleModel");
 const GroupModel = require("../Model/GroupModel");
+const { find } = require("../Model/ScheduleModel");
 
 async function get(id, date) {
     const user = await UserModel.findById(id, ["schedule"]);
@@ -102,6 +103,14 @@ async function get(groupCode) {
         const _s = await ScheduleModel.findById(_sid);
     }
 }
+async function getGroupScheduleForMonth(groupCode, year, month) {
+    year = parseInt(year);
+    month = parseInt(month);
+    const _s = new Date(`${year}/${month}/1 00:00`);
+    const _e = month == 12 ? new Date(`${year+1}/1/1 00:00`) : new Date(`${year}/${month+1}/1 00:00`);
+
+    return await ScheduleModel.find({groupCode, start : {$gte : _s, $lt : _e}});
+}
 
 // 투표 후 자동으로 연결
 async function setGroupSchedule(voteData) {
@@ -136,7 +145,34 @@ async function setGroupSchedule(voteData) {
 }
 
 async function getGroupSchedule(groupCode) {
-    return await ScheduleModel.find({groupCode, start : {$lte : new Date()}})
+    const schedules = await ScheduleModel.find({groupCode, start : {$gte : Date.now()}});
+    if(!schedules || schedules.length == 0) return null;
+
+    const d = new Date();
+    d.setHours(0);
+    d.setMinutes(0);
+    
+    return schedules.reduce((acc, element) => {
+        let {start, end} = element;
+        start = new Date(start);
+        end = new Date(end);
+        const _start = `${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()} ${start.getHours()}:${start.getMinutes()}`;
+        const _end = `${end.getFullYear()}-${end.getMonth()+1}-${end.getDate()} ${end.getHours()}:${end.getMinutes()}`;
+
+        const _sD = new Date(element.start);
+        _sD.setHours(0);
+        _sD.setMinutes(0);
+        const gap = d.getTime() - _sD.getTime();
+        acc.push({
+            name : element.name,
+            start : _start, end : _end,
+            memo : element.memo,
+            dday : Math.floor(gap / (1000 * 60 * 60 * 24))
+        });
+        return acc;
+    }, []).sort((a,b) => {
+        return b.dday - a.dday;
+    });
 }
 module.exports = {
     get,
@@ -144,5 +180,6 @@ module.exports = {
     remove,
 
     getGroupSchedule,
-    setGroupSchedule
+    setGroupSchedule,
+    getGroupScheduleForMonth
 }

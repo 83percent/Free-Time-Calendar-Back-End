@@ -34,8 +34,8 @@ async function getVoteList(groupCode) {
         const {_id, agree, name, memo, start, end, minLength} = await VoteModel.findById(voteID);
         if(_id) resultArr.push({
             _id, name, memo, agree, minLength,
-            start : `${start.getFullYear()}-${start.getMonth()}-${start.getDate()} ${start.getHours()}:${start.getMinutes()}`,
-            end : `${end.getFullYear()}-${end.getMonth()}-${end.getDate()} ${end.getHours()}:${end.getMinutes()}`
+            start : `${start.getFullYear()}-${start.getMonth()+1}-${start.getDate()} ${start.getHours()}:${start.getMinutes()}`,
+            end : `${end.getFullYear()}-${end.getMonth()+1}-${end.getDate()} ${end.getHours()}:${end.getMinutes()}`
         });
     }
     return resultArr;

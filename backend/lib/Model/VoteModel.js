@@ -11,8 +11,7 @@ const VoteModel = mongoose.Schema({
         required: true
     },
     memo : {
-        type: String,
-        required: true
+        type: String
     },
     start : {
         type: Date,
