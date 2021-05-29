@@ -19,4 +19,11 @@ router.get("/:groupCode/:year/:month", async (req,res) => {
     const result = await Vote.getVoteForMonth(groupCode, year, month);
 });
 
+router.post("/complete/:voteCode", async(req, res) => {
+    const voteCode = req.params?.voteCode;
+    const result = await Vote.completeVote(voteCode);
+    if(result) res.send(result);
+    else if(result == null) res.sendStatus(StatusCode.nodata);
+    else res.sendStatus(500);
+});
 module.exports = router;

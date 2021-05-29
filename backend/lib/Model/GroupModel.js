@@ -33,7 +33,7 @@ const GroupModel = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    schedules : [],
+    schedule : [],
     reg_date : {
         type: Date,
         default: Date.now()

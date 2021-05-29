@@ -2,6 +2,8 @@ const VoteModel = require("../Model/VoteModel");
 const GroupModel = require("../Model/GroupModel");
 
 const Time = require("../ChangeTimezone");
+const Alarm = require("./Alarm");
+const Schedule = require("./Schedule");
 
 async function addVote(groupCode, reg_id ,name, start, end, minLength, memo) {
     const vote = new VoteModel({
@@ -25,13 +27,13 @@ async function addVote(groupCode, reg_id ,name, start, end, minLength, memo) {
 
 async function getVoteList(groupCode) {
     const {vote} = await GroupModel.findById(groupCode, ["vote"]);
+    console.log(vote);
     if(!vote || vote?.length == 0) return [];
-    
     let resultArr = [];
     for(const voteID of vote) {
-        const {_id, agree, name, memo, start, end} = await VoteModel.findById(voteID);
+        const {_id, agree, name, memo, start, end, minLength} = await VoteModel.findById(voteID);
         if(_id) resultArr.push({
-            _id, name, memo, agree,
+            _id, name, memo, agree, minLength,
             start : `${start.getFullYear()}-${start.getMonth()}-${start.getDate()} ${start.getHours()}:${start.getMinutes()}`,
             end : `${end.getFullYear()}-${end.getMonth()}-${end.getDate()} ${end.getHours()}:${end.getMinutes()}`
         });
@@ -71,7 +73,18 @@ async function getVoteForMonth(groupCode, year, month) {
     return vote;
 }
 
+async function completeVote(voteCode) {
+    const vote = await VoteModel.findByIdAndDelete(voteCode);
+    console.log(vote);
+    if(!vote) return null;
+    else {
+        if(await Schedule.setGroupSchedule(vote) != null) {
+            return vote;
+        } else return false;
+    }
+}
 
 module.exports = {
-    addVote, getVoteList, vote, getVoteForMonth
+    addVote, getVoteList, vote, getVoteForMonth,
+    completeVote,
 }
