@@ -303,8 +303,6 @@ router.post("/vote/:groupCode", async (req, res) => {
 router.get("/schedule/:groupCode", async (req, res) => {
     const code = req.params?.groupCode;
     const result = await Schedule.getGroupSchedule(code);
-    console.log("비교 날짜 : ", new Date())
-    console.log(result);
     if(result) res.send(result);
     else res.sendStatus(404);
 });
@@ -318,6 +316,7 @@ router.get("/schedule/:groupCode/:year/:month", async (req, res) => {
     else {
         const result = await Schedule.getGroupScheduleForMonth(groupCode, year, month);
         console.log(result);
+        res.send(result);
     }
 });
 module.exports = router;

@@ -109,7 +109,13 @@ async function getGroupScheduleForMonth(groupCode, year, month) {
     const _s = new Date(`${year}/${month}/1 00:00`);
     const _e = month == 12 ? new Date(`${year+1}/1/1 00:00`) : new Date(`${year}/${month+1}/1 00:00`);
 
-    return await ScheduleModel.find({groupCode, start : {$gte : _s, $lt : _e}});
+    //const schedule = await ScheduleModel.find({groupCode, start : {$gte : _s, $lt : _e}}, ["start", "end", "name", "memo"]);
+    return await ScheduleModel.find({groupCode, start : {$gte : _s, $lt : _e}}, ["start", "end", "name", "memo"]);
+    /* return schedule.map(({_id, name, memo, start, end}) => {
+        return {
+            _id, name, memo, start : start.getDate(), end : end.getDate()
+        };
+    }); */
 }
 
 // 투표 후 자동으로 연결
@@ -129,7 +135,6 @@ async function setGroupSchedule(voteData) {
 
     for(const agreeID of agree) {
         const user = await UserModel.findById(agreeID, ["schedule", "alarm"]);
-        console.log("검색 유저 : ",user)
         if(!user?.schedule) user.schedule = new Object();
         if(!user.schedule[`${start.getFullYear()}-${start.getMonth()}`]) user.schedule[`${start.getFullYear()}-${start.getMonth()}`] = new Array();
         user.schedule[`${start.getFullYear()}-${start.getMonth()}`].push(_s._id);
