@@ -3,6 +3,8 @@ const ScheduleModel = require("../Model/ScheduleModel");
 const GroupModel = require("../Model/GroupModel");
 const { find } = require("../Model/ScheduleModel");
 
+const Notification = require("./Notification");
+
 async function get(id, date) {
     const user = await UserModel.findById(id, ["schedule"]);
     if(!user) return null;
@@ -133,17 +135,40 @@ async function setGroupSchedule(voteData) {
     group.schedule.push(_s._id);
     await group.save();
 
+    const _Sd = new Date(start);
+    const date = `Y${_Sd.getFullYear()}-M${_Sd.getMonth()+1}`
     for(const agreeID of agree) {
         const user = await UserModel.findById(agreeID, ["schedule", "alarm"]);
-        if(!user?.schedule) user.schedule = new Object();
-        if(!user.schedule[`${start.getFullYear()}-${start.getMonth()}`]) user.schedule[`${start.getFullYear()}-${start.getMonth()}`] = new Array();
-        user.schedule[`${start.getFullYear()}-${start.getMonth()}`].push(_s._id);
+
+        if(!user?.schedule) user.schedule = new Array();
+        let pass = false;
+        for(const element of user.schedule) {
+            if(element?.cate == date) {
+                element.list.push(_s._id);
+                pass = true;
+                break;
+            }
+            await user.save();
+        }
+
+        if(!pass) {
+            // 새로 생성
+            user.schedule.push({
+                cate : date,
+                list : [_s._id]
+            });
+            await user.save();
+        }
+        
+
         if(!user.alarm) user.alarm = new Array();
         user.alarm.push({
-            type: "newSchedule",
-            groupName : group.name,
-            scheduleName: name
+            type: "schedule",
+            message1: group.name,
+            message2: name,
+            access: groupCode
         });
+        console.log("유저데이터에 추가 : ",user);
         await user.save();
     }
     return true;

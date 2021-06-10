@@ -1,13 +1,13 @@
 const UserModel = require("../Model/UserModel");
 
-const alarmTypes = ["newSchedule", "acceptGroup", "sendInvitation", "rejectGroup"];
+const alarmTypes = ["schedule", "group", "vote"];
 
-async function addAlarm(id, type, message) {
+async function addAlarm(id, type, message1, message2, access) {
     if(!alarmTypes.includes(type)) return false;
     try {
         
         const user = await UserModel.findById(id, ["alarm"]);
-        user.alarm.push({ type, message });
+        user.alarm.push({ type, message1, message2, access });
         await user.save();
         return true;
     } catch {

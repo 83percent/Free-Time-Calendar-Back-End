@@ -1,6 +1,8 @@
 const GroupModel = require('../Model/GroupModel');
 const UserModel = require('../Model/UserModel');
 
+const Notification  = require("./Notification");
+
 // 그룹 만들기
 /*
     @param id:string 최초 생성자 고유 id
@@ -17,6 +19,9 @@ async function create(id, name) {
         const user = await UserModel.findById(id);
         user.group.push(result._id);
         await user.save();
+
+        // ADD ALARM
+        Notification.set(id, result._id, 'group', name);
 
         return result._id;
     } catch(err) {console.log(err); return 'error';}

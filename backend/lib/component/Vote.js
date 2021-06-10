@@ -4,6 +4,7 @@ const GroupModel = require("../Model/GroupModel");
 const Time = require("../ChangeTimezone");
 const Alarm = require("./Alarm");
 const Schedule = require("./Schedule");
+const UserModel = require("../Model/UserModel");
 
 async function addVote(groupCode, reg_id ,name, start, end, minLength, memo) {
     const vote = new VoteModel({
@@ -16,12 +17,23 @@ async function addVote(groupCode, reg_id ,name, start, end, minLength, memo) {
     const result = await vote.save();
     if(!result) return null;
 
-    const group = await GroupModel.findById(groupCode, ["vote"]);
+    const group = await GroupModel.findById(groupCode, ["vote", "group"]);
     if(!group) return null;
     
     group.vote.push(result._id);
     await group.save();
 
+    for(const userID of group.group) {
+        const user = await UserModel.findById(userID, ["alarm"]);
+        if(!user.alarm) user.alarm = new Array();
+        user.alarm.push({
+            type: "vote",
+            message1: name,
+            access: vote._id
+        });
+        await user.save();
+    }
+    
     return result;
 }
 

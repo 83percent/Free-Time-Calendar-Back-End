@@ -39,9 +39,7 @@ const UserModel = new mongoose.Schema({
         type: String,
         required: true
     },
-    schedule : {
-        type: Object
-    }, 
+    schedule : [FreeCateModel], 
     /*
         schedule : {
             'Y2021-M4' : [

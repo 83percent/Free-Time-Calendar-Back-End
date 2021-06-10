@@ -68,9 +68,27 @@ router.delete('/:id', async (req, res) => {
     if(!id) res.sendStatus(401);
 }); // Delete User
 
-router.put(':/id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     const id = req.params.id;
     if(!id) res.sendStatus(401);
 }); // Modify User
+
+router.get("/time/:id/:year/:month", async (req, res) => {
+    const {id, year, month} = req.params;
+    const result = await User.getTimes(id, year, month);
+    res.send(result);
+});
+router.get("/time/:id/:year/:month/:day", async (req, res) => {
+    const {id, year, month, day} = req.params;
+    const result = await User.getDateTime(id, year, month, day);
+    if(result.length > 0) {
+        res.send(result);
+    } else res.sendStatus(404);
+    
+});
+router.post("/schedule/:id", async (req, res) => {
+    const id = req.params.id;
+    const result = await User.setSchedule(id, req.body);
+});
 
 module.exports = router;

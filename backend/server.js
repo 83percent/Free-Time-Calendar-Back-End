@@ -8,6 +8,7 @@ const GroupRouter = require('./router/GroupRouter');
 const ApplyRouter = require('./router/ApplyRouter');
 const FreeRouter = require('./router/FreeRouter');
 const VoteRouter = require('./router/VoteRouter');
+const NotificationRouter = require('./router/NotificationRouter');
 
 // FIELD
 const PORT = 3001;
@@ -20,6 +21,7 @@ server.use('/group', GroupRouter);
 server.use('/apply', ApplyRouter);
 server.use('/free', FreeRouter);
 server.use('/vote', VoteRouter);
+server.use('/notification', NotificationRouter);
 
 server.listen(PORT, () => {
     console.log(" Start Server.js PORT : ",PORT);
